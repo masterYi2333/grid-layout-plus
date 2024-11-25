@@ -1,1 +1,10 @@
-module.exports = require('@vexip-ui/prettier-config')
+module.exports = {
+    singleQuote: true,
+    semi: false,
+    trailingComma: 'none',
+    printWidth: 100,
+    tabWidth: 4,
+    useTabs: false,
+    bracketSpacing: true,
+    arrowParens: 'avoid'
+}
