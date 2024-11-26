@@ -286,37 +286,31 @@ export function moveElementAwayFromCollision(
     oldY?: number
 ): Layout {
     const preventCollision = false // we're already colliding
-    // If there is enough space above the collision to put this element, move it there.
-    // We only do this on the main collision as this can get funky in cascades and cause
-    // unwanted swapping behavior.
 
-    // if (isUserAction) {
-    //     // Make a mock item so we don't modify the item here, only modify in moveElement.
-    //     const fakeItem: LayoutItem = {
-    //         x: itemToMove.x,
-    //         y: itemToMove.y,
-    //         w: itemToMove.w,
-    //         h: itemToMove.h / 2,
-    //         i: '-1'
-    //     }
-    //
-    //     fakeItem.y = Math.max(collidesWith.y - itemToMove.h, 0)
-    //
-    //     if (!getFirstCollision(layout, fakeItem)) {
-    //         return moveElement(layout, itemToMove, undefined, fakeItem.y, preventCollision)
-    //     }
-    // }
-
-    if (
-
+    const lrRules =
         oldX !== collidesWith.x &&
-        collidesWith.y - itemToMove.y <= 3 &&
-        collidesWith.y - itemToMove.y >= -1
-    ) {
-        const isToLeft = collidesWith.x > itemToMove.x && collidesWith.x < oldX
-        const isToRight = collidesWith.x > oldX
-        const toLeft = mouseX <= itemToMove.x + 1
-        const toRight = mouseX + collidesWith.w >= itemToMove.x + itemToMove.w - 1
+        oldY - itemToMove.y <= 3 && // 这里是规定一个左右的边界 y轴过大 不进行左右移动
+        oldY - itemToMove.y >= -3 &&
+        itemToMove.y <= oldY + collidesWith.h
+
+    if (oldY <= collidesWith.y + collidesWith.h && !lrRules) {
+        // console.log(33)
+        collidesWith.y = oldY
+        return layout
+    }
+    console.log(oldX, collidesWith.x)
+    if (lrRules) {
+        // console.log('lr')
+
+        // 向左时候  拖拽元素的x坐标小于碰撞元素的x坐标
+        const isToLeft = collidesWith.x < oldX && collidesWith.x > itemToMove.x
+        // 向右时候  拖拽元素的x坐标大于碰撞元素的x坐标
+        const isToRight =
+            collidesWith.x > oldX && collidesWith.x + collidesWith.w < itemToMove.x + itemToMove.w
+
+        // 这里是触发左右的x范围
+        const toLeft = mouseX <= itemToMove.x + 2 && itemToMove.y - collidesWith.h + oldY
+        const toRight = mouseX + collidesWith.w >= itemToMove.x + itemToMove.w - 2
 
         if (isToLeft && toLeft) {
             // console.log('move left')
@@ -338,15 +332,20 @@ export function moveElementAwayFromCollision(
     }
     if (
         oldY !== collidesWith.y &&
-        collidesWith.x - itemToMove.x <= 1 &&
-        collidesWith.x - itemToMove.x >= -1
+        Math.abs(oldY - itemToMove.y) < itemToMove.h &&
+        oldX - itemToMove.x <= 2 &&
+        oldX - itemToMove.x >= -2
     ) {
-        const isToTop = collidesWith.y < oldY
-        const isToBottom = collidesWith.y > oldY
-        const toTop = mouseY <= itemToMove.y + 1
-        const toBottom = mouseY + collidesWith.h >= itemToMove.y + itemToMove.h - 1
+        // console.log('tb')
+        const isToTop = collidesWith.y < oldY && collidesWith.y > itemToMove.y
+
+        const isToBottom =
+            collidesWith.y > oldY && collidesWith.y + collidesWith.h < itemToMove.y + itemToMove.h
+        const toTop = mouseY <= itemToMove.y + 2
+        const toBottom = mouseY + collidesWith.h >= itemToMove.y + itemToMove.h - 2
 
         if (isToTop && toTop) {
+            // debugger
             // console.log('move top')
             collidesWith.y = itemToMove.y
             itemToMove.y = collidesWith.y + collidesWith.h
@@ -355,7 +354,7 @@ export function moveElementAwayFromCollision(
         } else if (isToBottom && toBottom) {
             // console.log('move bottom')
 
-            itemToMove.y = oldY
+            itemToMove.y = collidesWith.y
             collidesWith.y = itemToMove.y + itemToMove.h
 
             return layout

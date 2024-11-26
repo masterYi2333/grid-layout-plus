@@ -6,10 +6,12 @@ import { throttle } from '@vexip-ui/utils'
 import { GridLayout } from 'grid-layout-plus'
 
 const layout = ref([
-    { x: 0, y: 0, w: 4, h: 6, i: '0' },
-    { x: 4, y: 0, w: 4, h: 6, i: '1' },
-    { x: 0, y: 6, w: 4, h: 6, i: '2' },
-    { x: 4, y: 6, w: 4, h: 6, i: '3' }
+    { x: 0, y: 0, w: 6, h: 6, i: '0' },
+    { x: 6, y: 0, w: 6, h: 6, i: '1' },
+    { x: 0, y: 6, w: 6, h: 6, i: '2' },
+    { x: 6, y: 6, w: 6, h: 6, i: '3' },
+    // { x: 4, y: 6, w: 4, h: 6, i: '4' },
+    // { x: 4, y: 6, w: 4, h: 6, i: '5' }
 ])
 
 const wrapper = ref<HTMLElement>()
@@ -32,7 +34,7 @@ function dragStart(event) {
 
 let isDragging = false
 
-function handleDrag(event) {
+ function handleDrag(event) {
     if (!isDragging) {
         isDragging = true
         requestAnimationFrame(() => {
@@ -171,38 +173,38 @@ function dragEnd(event) {
 </script>
 
 <template>
-<div class="layout-json">
-    Displayed as <code>[x, y, w, h]</code>:
-    <div class="columns">
-        <div v-for="item in layout" :key="item.i" class="layout-item">
-            <b>{{ item.i }}</b
-            >: [{{ item.x }}, {{ item.y }}, {{ item.w }}, {{ item.h }}]
+    <div class="layout-json">
+        Displayed as <code>[x, y, w, h]</code>:
+        <div class="columns">
+            <div v-for="item in layout" :key="item.i" class="layout-item">
+                <b>{{ item.i }}</b
+                >: [{{ item.x }}, {{ item.y }}, {{ item.w }}, {{ item.h }}]
+            </div>
         </div>
     </div>
-</div>
-<br />
-<div
-    class="droppable-element"
-    draggable="true"
-    unselectable="on"
-    @drag="handleDrag"
-    @dragstart="dragStart"
-    @dragend="dragEnd"
->
-    Droppable Element (Drag me!)
-</div>
-<div ref="wrapper">
-    <GridLayout
-        ref="gridLayout"
-        v-model:layout="layout"
-        :row-height="30"
-        :use-css-transforms="true"
+    <br />
+    <div
+        class="droppable-element"
+        draggable="true"
+        unselectable="on"
+        @drag="handleDrag"
+        @dragstart="dragStart"
+        @dragend="dragEnd"
     >
-        <template #item="{ item }">
-            <span class="text">{{ item.i }}</span>
-        </template>
-    </GridLayout>
-</div>
+        Droppable Element (Drag me!)
+    </div>
+    <div ref="wrapper">
+        <GridLayout
+            ref="gridLayout"
+            v-model:layout="layout"
+            :row-height="30"
+            :use-css-transforms="true"
+        >
+            <template #item="{ item }">
+                <span class="text">{{ item.i }}</span>
+            </template>
+        </GridLayout>
+    </div>
 </template>
 
 <style scoped>
